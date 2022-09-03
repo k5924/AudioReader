@@ -1,23 +1,15 @@
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-/**
- * 
- */
+public class ExtensibleAudioReader {
 
-/**
- * @author tr1x
- *
- */
-public class AudioReader {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
@@ -43,34 +35,76 @@ public class AudioReader {
 
 //			1. the MPEG Audio Version ID of the file
 			// This is located in the second byte of the byteBuffer at index 4 and 5
-			if ((((byteBuffer[1] >> 4) & 1) == 1) && (((byteBuffer[1] >> 5) & 1) == 1)) {
-				System.out.println("MPEG Version 1");
-				version = 1;
-			} else if ((((byteBuffer[1] >> 4) & 1) == 1) && (((byteBuffer[1] >> 5) & 1) == 0)) {
-				System.out.println("reserved");
-			} else if ((((byteBuffer[1] >> 4) & 1) == 0) && (((byteBuffer[1] >> 5) & 1) == 0)) {
-				System.out.println("MPEG Version 2.5");
-				version = 3;
-			} else {
-				System.out.println("MPEG Version 2");
-				version = 2;
+			Map<String, Integer[]> versions = new HashMap<String, Integer[]>() {
+				/**
+						 * 
+						 */
+				private static final long serialVersionUID = 1L;
+
+				{
+					put("MPEG Version 1", new Integer[] { 1, 1 });
+					put("reserved", new Integer[] { 1, 0 });
+					put("MPEG Version 2.5", new Integer[] { 0, 0 });
+					put("MPEG Version 2", new Integer[] { 0, 1 });
+				}
+			};
+
+			for (Entry<String, Integer[]> entry : versions.entrySet()) {
+				if (Arrays.toString(entry.getValue()).equals(
+						Arrays.toString(new Integer[] { ((byteBuffer[1] >> 4) & 1), ((byteBuffer[1] >> 5) & 1) }))) {
+					System.out.println(entry.getKey());
+					switch(entry.getKey()) {
+					case "MPEG Version 1":
+							version+=1;
+							break;
+					case "reserved":
+							break;
+					case "MPEG Version 2.5":
+							version+=3;
+							break;
+					case "MPEG Verison 2":
+							version+=2;
+							break;
+					}
+				}
 			}
 
 //			2. the MPEG Layer of the file
 			// Located in second byte of the byteBuffer at index 6 and 7
-			if ((((byteBuffer[1] >> 6) & 1) == 1) && (((byteBuffer[1] >> 7) & 1) == 1)) {
-				System.out.println("Layer I");
-				layer = 1;
-			} else if ((((byteBuffer[1] >> 6) & 1) == 1) && (((byteBuffer[1] >> 7) & 1) == 0)) {
-				System.out.println("Layer III");
-				layer = 3;
-			} else if ((((byteBuffer[1] >> 6) & 1) == 0) && (((byteBuffer[1] >> 7) & 1) == 0)) {
-				System.out.println("reserved");
-			} else {
-				System.out.println("Layer II");
-				layer = 2;
-			}
+			Map<String, Integer[]> layers = new HashMap<String, Integer[]>() {
+				/**
+						 * 
+						 */
+				private static final long serialVersionUID = 1L;
 
+				{
+					put("Layer I", new Integer[] { 1, 1 });
+					put("Layer III", new Integer[] { 1, 0 });
+					put("reserved", new Integer[] { 0, 0 });
+					put("Layer II", new Integer[] { 0, 1 });
+				}
+			};
+			
+			for (Entry<String, Integer[]> entry : layers.entrySet()) {
+				if (Arrays.toString(entry.getValue()).equals(
+						Arrays.toString(new Integer[] { ((byteBuffer[1] >> 6) & 1), ((byteBuffer[1] >> 7) & 1) }))) {
+					System.out.println(entry.getKey());
+					switch(entry.getKey()) {
+					case "Layer I":
+							layer+=1;
+							break;
+					case "Layer III":
+							layer += 3;
+							break;
+					case "reserved":
+							break;
+					case "MLayer II":
+							layer+=2;
+							break;
+					}
+				}
+			}
+						
 //			3. the bitrate of the file
 			// Located in third byte of byteBuffer at index 1, 2, 3 and 4
 			if ((((byteBuffer[2] >> 4) & 1) == 0) && (((byteBuffer[2] >> 3) & 1) == 0)
@@ -449,17 +483,28 @@ public class AudioReader {
 			}
 
 //			5. the channel mode of the file
-			if ((((byteBuffer[3] >> 2) & 1) == 0) && (((byteBuffer[3] >> 1) & 1) == 0)) {
-				System.out.println("Stereo");
-			} else if ((((byteBuffer[3] >> 2) & 1) == 0) && (((byteBuffer[3] >> 1) & 1) == 1)) {
-				System.out.println("Joint stereo (Stereo)");
-			} else if ((((byteBuffer[3] >> 2) & 1) == 1) && (((byteBuffer[3] >> 1) & 1) == 0)) {
-				System.out.println("Dual channel (2 mono channels)");
-			} else {
-				System.out.println("Single channel (Mono)");
-			}
+			Map<String, Integer[]> channels = new HashMap<String, Integer[]>() {
+				/**
+						 * 
+						 */
+				private static final long serialVersionUID = 1L;
 
-			// Results to match this
+				{
+					put("Single channel (Mono)", new Integer[] { 1, 1 });
+					put("Dual channel (2 mono channels)", new Integer[] { 1, 0 });
+					put("Stereo", new Integer[] { 0, 0 });
+					put("Joint stereo (Stereo)", new Integer[] { 0, 1 });
+				}
+			};
+
+			for (Entry<String, Integer[]> entry : channels.entrySet()) {
+				if (Arrays.toString(entry.getValue()).equals(
+						Arrays.toString(new Integer[] { ((byteBuffer[3] >> 2) & 1), ((byteBuffer[3] >> 1) & 1) }))) {
+					System.out.println(entry.getKey());
+				}
+			}
+			
+		// Results to match this
 //			1. MPEG Version 1
 //			2. Layer 3
 //			3. 256
@@ -469,7 +514,7 @@ public class AudioReader {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		
+	
 	}
 
 }
