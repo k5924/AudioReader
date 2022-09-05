@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 public class ExtensibleAudioReader {
 
-	public static int getVersion(byte[] byteBuffer) {
+	public static int getVersion(final byte[] byteBuffer) {
 		final String[] versions = { "MPEG Version 2.5", "reserved", "MPEG Version 2", "MPEG Version 1" };
 
 		final String version = versions[Integer
@@ -25,7 +25,7 @@ public class ExtensibleAudioReader {
 		}
 	}
 
-	public static int getLayer(byte[] byteBuffer) {
+	public static int getLayer(final byte[] byteBuffer) {
 		final String[] layers = { "reserved", "Layer III", "Layer II", "Layer I" };
 
 		final String layer = layers[(Integer
@@ -44,7 +44,7 @@ public class ExtensibleAudioReader {
 		}
 	}
 
-	public static void getBitrate(byte[] byteBuffer, int version, int layer) {
+	public static void getBitrate(final byte[] byteBuffer, final int version, final int layer) {
 		final String[][] bitrates = { { "free", "free", "free", "free", "free" }, { "32", "32", "32", "32", "8" },
 				{ "64", "48", "40", "48", "16" }, { "96", "56", "48", "56", "24" }, { "128", "64", "56", "64", "32" },
 				{ "160", "80", "64", "80", "40" }, { "192", "96", "80", "96", "48" },
@@ -75,7 +75,7 @@ public class ExtensibleAudioReader {
 		}
 	}
 
-	public static void getSamplerate(byte[] byteBuffer, int version) {
+	public static void getSamplerate(final byte[] byteBuffer, final int version) {
 		final String[][] samplerates = { { "44100 Hz", "22050 Hz", "11025 Hz" }, { "48000 Hz", "24000 Hz", "12000 Hz" },
 				{ "32000 Hz", "16000 Hz", "8000 Hz" }, { "reserv.", "reserv.", "reserv." } };
 
@@ -91,7 +91,7 @@ public class ExtensibleAudioReader {
 		}
 	}
 
-	public static void getChannelMode(byte[] byteBuffer) {
+	public static void getChannelMode(final byte[] byteBuffer) {
 		final String[] channels = { "Stereo", "Joint stereo (Stereo)", "Dual channel (2 mono channels)",
 				"Single channel (Mono)" };
 
@@ -99,7 +99,7 @@ public class ExtensibleAudioReader {
 				.parseInt((String.valueOf((byteBuffer[3] >> 2) & 1) + String.valueOf(((byteBuffer[3] >> 1) & 1))), 2)]);
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// TODO Auto-generated method stub
 		try {
 			// Read file into a byte buffer
@@ -145,8 +145,9 @@ public class ExtensibleAudioReader {
 //			4. 44100
 //			5. 3 (Mono)
 
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 	}
+
 }
