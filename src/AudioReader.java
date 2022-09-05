@@ -19,6 +19,7 @@ public class AudioReader {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		long startTime = System.nanoTime();
 		// TODO Auto-generated method stub
 		try {
 			// Read file into a byte buffer
@@ -469,7 +470,9 @@ public class AudioReader {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		
+		long endTime = System.nanoTime();
+		System.out.println("Took " + (endTime - startTime) + " ns");
+
 	}
 
 }
