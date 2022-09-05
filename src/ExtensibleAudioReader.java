@@ -3,18 +3,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class ExtensibleAudioReader {
 
 	public static int getVersion(byte[] byteBuffer) {
 		final String[] versions = { "MPEG Version 2.5", "reserved", "MPEG Version 2", "MPEG Version 1" };
 
-		String version = versions[Integer
+		final String version = versions[Integer
 				.parseInt(String.valueOf((byteBuffer[1] >> 5) & 1) + String.valueOf(((byteBuffer[1] >> 4) & 1)), 2)];
 		System.out.println(version);
 
@@ -33,7 +28,7 @@ public class ExtensibleAudioReader {
 	public static int getLayer(byte[] byteBuffer) {
 		final String[] layers = { "reserved", "Layer III", "Layer II", "Layer I" };
 
-		String layer = layers[(Integer
+		final String layer = layers[(Integer
 				.parseInt(String.valueOf((byteBuffer[1] >> 7) & 1) + String.valueOf(((byteBuffer[1] >> 6) & 1)), 2))];
 		System.out.println(layer);
 
@@ -97,26 +92,22 @@ public class ExtensibleAudioReader {
 	}
 
 	public static void getChannelMode(byte[] byteBuffer) {
-		final String[] channels = {
-				"Stereo",
-				"Joint stereo (Stereo)",
-				"Dual channel (2 mono channels)",
-				"Single channel (Mono)"
-		};
-		
-		System.out.println(channels[Integer.parseInt((String.valueOf((byteBuffer[3] >> 2) & 1) + String.valueOf(((byteBuffer[3] >> 1) & 1))), 2)]);
+		final String[] channels = { "Stereo", "Joint stereo (Stereo)", "Dual channel (2 mono channels)",
+				"Single channel (Mono)" };
+
+		System.out.println(channels[Integer
+				.parseInt((String.valueOf((byteBuffer[3] >> 2) & 1) + String.valueOf(((byteBuffer[3] >> 1) & 1))), 2)]);
 	}
 
 	public static void main(String[] args) {
-		long startTime = System.nanoTime();
 		// TODO Auto-generated method stub
 		try {
 			// Read file into a byte buffer
-			Path path = FileSystems.getDefault().getPath("LBCNews.mp3").toAbsolutePath();
-			File file = new File(path.toString());
+			final Path path = FileSystems.getDefault().getPath("LBCNews.mp3").toAbsolutePath();
+			final File file = new File(path.toString());
 			// Read the first frame of an audio file
-			byte[] byteBuffer = new byte[4];
-			FileInputStream fileInputStream = new FileInputStream(file);
+			final byte[] byteBuffer = new byte[4];
+			final FileInputStream fileInputStream = new FileInputStream(file);
 			fileInputStream.read(byteBuffer);
 			// System.out.println(fileInputStream.read(byteBuffer));
 			fileInputStream.close();
@@ -131,11 +122,11 @@ public class ExtensibleAudioReader {
 
 //			1. the MPEG Audio Version ID of the file
 			// This is located in the second byte of the byteBuffer at index 4 and 5
-			int version = getVersion(byteBuffer);
+			final int version = getVersion(byteBuffer);
 
 //			2. the MPEG Layer of the file
 			// Located in second byte of the byteBuffer at index 6 and 7
-			int layer = getLayer(byteBuffer);
+			final int layer = getLayer(byteBuffer);
 
 //			3. the bitrate of the file
 			// Located in third byte of byteBuffer at index 1, 2, 3 and 4
@@ -157,9 +148,5 @@ public class ExtensibleAudioReader {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		long endTime = System.nanoTime();
-		System.out.println("Took " + (endTime - startTime) + " ns");
-
 	}
-
 }
