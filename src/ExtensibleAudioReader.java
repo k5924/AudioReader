@@ -12,21 +12,10 @@ import java.util.Map.Entry;
 public class ExtensibleAudioReader {
 
 	public static int getVersion(byte[] byteBuffer) {
-		Map<List<Integer>, String> versions = new HashMap<List<Integer>, String>() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
+		final String[] versions = { "MPEG Version 2.5", "reserved", "MPEG Version 2", "MPEG Version 1" };
 
-			{
-				put(Arrays.asList(1, 1), "MPEG Version 1");
-				put(Arrays.asList(1, 0), "reserved");
-				put(Arrays.asList(0, 0), "MPEG Version 2.5");
-				put(Arrays.asList(0, 1), "MPEG Version 2");
-			}
-		};
-
-		String version = versions.get(Arrays.asList(((byteBuffer[1] >> 4) & 1), ((byteBuffer[1] >> 5) & 1)));
+		String version = versions[Integer
+				.parseInt(String.valueOf((byteBuffer[1] >> 5) & 1) + String.valueOf(((byteBuffer[1] >> 4) & 1)), 2)];
 		System.out.println(version);
 
 		switch (version) {
@@ -42,21 +31,10 @@ public class ExtensibleAudioReader {
 	}
 
 	public static int getLayer(byte[] byteBuffer) {
-		Map<List<Integer>, String> layers = new HashMap<List<Integer>, String>() {
-			/**
-					 * 
-					 */
-			private static final long serialVersionUID = 1L;
+		final String[] layers = { "reserved", "Layer III", "Layer II", "Layer I" };
 
-			{
-				put(Arrays.asList(1, 1), "Layer I");
-				put(Arrays.asList(1, 0), "Layer III");
-				put(Arrays.asList(0, 0), "reserved");
-				put(Arrays.asList(0, 1), "Layer II");
-			}
-		};
-
-		String layer = layers.get(Arrays.asList(((byteBuffer[1] >> 6) & 1), ((byteBuffer[1] >> 7) & 1)));
+		String layer = layers[(Integer
+				.parseInt(String.valueOf((byteBuffer[1] >> 7) & 1) + String.valueOf(((byteBuffer[1] >> 6) & 1)), 2))];
 		System.out.println(layer);
 
 		switch (layer) {
@@ -72,35 +50,19 @@ public class ExtensibleAudioReader {
 	}
 
 	public static void getBitrate(byte[] byteBuffer, int version, int layer) {
-		Map<List<Integer>, String[]> bitrates = new HashMap<List<Integer>, String[]>() {
+		final String[][] bitrates = { { "free", "free", "free", "free", "free" }, { "32", "32", "32", "32", "8" },
+				{ "64", "48", "40", "48", "16" }, { "96", "56", "48", "56", "24" }, { "128", "64", "56", "64", "32" },
+				{ "160", "80", "64", "80", "40" }, { "192", "96", "80", "96", "48" },
+				{ "224", "112", "96", "112", "56" }, { "256", "128", "112", "128", "64" },
+				{ "288", "160", "128", "144", "80" }, { "320", "192", "160", "160", "96" },
+				{ "352", "224", "192", "176", "112" }, { "384", "256", "224", "192", "128" },
+				{ "416", "320", "256", "224", "144" }, { "448", "384", "320", "256", "160" },
+				{ "bad", "bad", "bad", "bad", "bad" } };
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
+		final String[] possibleBitrates = bitrates[Integer
+				.parseInt(String.valueOf(((byteBuffer[2] >> 4) & 1)) + String.valueOf(((byteBuffer[2] >> 3) & 1))
+						+ String.valueOf(((byteBuffer[2] >> 2) & 1)) + String.valueOf(((byteBuffer[2] >> 1) & 1)), 2)];
 
-			{
-				put(Arrays.asList(0, 0, 0, 0), new String[] { "free", "free", "free", "free", "free" });
-				put(Arrays.asList(0, 0, 0, 1), new String[] { "32", "32", "32", "32", "8" });
-				put(Arrays.asList(0, 0, 1, 0), new String[] { "64", "48", "40", "48", "16" });
-				put(Arrays.asList(0, 0, 1, 1), new String[] { "96", "56", "48", "56", "24" });
-				put(Arrays.asList(0, 1, 0, 0), new String[] { "128", "64", "56", "64", "32" });
-				put(Arrays.asList(0, 1, 0, 1), new String[] { "160", "80", "64", "80", "40" });
-				put(Arrays.asList(0, 1, 1, 0), new String[] { "192", "96", "80", "96", "48" });
-				put(Arrays.asList(0, 1, 1, 1), new String[] { "224", "112", "96", "112", "56" });
-				put(Arrays.asList(1, 0, 0, 0), new String[] { "256", "128", "112", "128", "64" });
-				put(Arrays.asList(1, 0, 0, 1), new String[] { "288", "160", "128", "144", "80" });
-				put(Arrays.asList(1, 0, 1, 0), new String[] { "320", "192", "160", "160", "96" });
-				put(Arrays.asList(1, 0, 1, 1), new String[] { "352", "224", "192", "176", "112" });
-				put(Arrays.asList(1, 1, 0, 0), new String[] { "384", "256", "224", "192", "128" });
-				put(Arrays.asList(1, 1, 0, 1), new String[] { "416", "320", "256", "224", "144" });
-				put(Arrays.asList(1, 1, 1, 0), new String[] { "448", "384", "320", "256", "160" });
-				put(Arrays.asList(1, 1, 1, 1), new String[] { "bad", "bad", "bad", "bad", "bad" });
-			}
-		};
-
-		String[] possibleBitrates = bitrates.get(Arrays.asList(((byteBuffer[2] >> 4) & 1), ((byteBuffer[2] >> 3) & 1),
-				((byteBuffer[2] >> 2) & 1), ((byteBuffer[2] >> 1) & 1)));
 		if (version == 1) {
 			if (layer == 1) {
 				System.out.println(possibleBitrates[0]);
@@ -119,23 +81,12 @@ public class ExtensibleAudioReader {
 	}
 
 	public static void getSamplerate(byte[] byteBuffer, int version) {
-		Map<List<Integer>, String[]> samplerates = new HashMap<List<Integer>, String[]>() {
+		final String[][] samplerates = { { "44100 Hz", "22050 Hz", "11025 Hz" }, { "48000 Hz", "24000 Hz", "12000 Hz" },
+				{ "32000 Hz", "16000 Hz", "8000 Hz" }, { "reserv.", "reserv.", "reserv." } };
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-			{
-				put(Arrays.asList(0, 0), new String[] { "44100 Hz", "22050 Hz", "11025 Hz" });
-				put(Arrays.asList(0, 1), new String[] { "48000 Hz", "24000 Hz", "12000 Hz" });
-				put(Arrays.asList(1, 0), new String[] { "32000 Hz", "16000 Hz", "8000 Hz" });
-				put(Arrays.asList(1, 1), new String[] { "reserv.", "reserv.", "reserv." });
+		final String[] possibleSamplerates = samplerates[Integer
+				.parseInt(String.valueOf(((byteBuffer[2] >> 6) & 1)) + String.valueOf(((byteBuffer[2] >> 5) & 1)), 2)];
 
-			}
-		};
-
-		String[] possibleSamplerates = samplerates
-				.get(Arrays.asList(((byteBuffer[2] >> 6) & 1), ((byteBuffer[2] >> 5) & 1)));
 		if (version == 1) {
 			System.out.println(possibleSamplerates[0]);
 		} else if (version == 2) {
@@ -146,21 +97,14 @@ public class ExtensibleAudioReader {
 	}
 
 	public static void getChannelMode(byte[] byteBuffer) {
-		Map<List<Integer>, String> channels = new HashMap<List<Integer>, String>() {
-			/**
-					 * 
-					 */
-			private static final long serialVersionUID = 1L;
-
-			{
-				put(Arrays.asList(1, 1), "Single channel (Mono)");
-				put(Arrays.asList(1, 0), "Dual channel (2 mono channels)");
-				put(Arrays.asList(0, 0), "Stereo");
-				put(Arrays.asList(0, 1), "Joint stereo (Stereo)");
-			}
+		final String[] channels = {
+				"Stereo",
+				"Joint stereo (Stereo)",
+				"Dual channel (2 mono channels)",
+				"Single channel (Mono)"
 		};
-
-		System.out.println(channels.get(Arrays.asList(((byteBuffer[3] >> 2) & 1), ((byteBuffer[3] >> 1) & 1))));
+		
+		System.out.println(channels[Integer.parseInt((String.valueOf((byteBuffer[3] >> 2) & 1) + String.valueOf(((byteBuffer[3] >> 1) & 1))), 2)]);
 	}
 
 	public static void main(String[] args) {
