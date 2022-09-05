@@ -1,29 +1,18 @@
 # Improvements
 
-1. Getting MPEG Audio Version
+For 1,2 and 5 switch the key and value, should be faster
 
-Store results in a Map<String, List[Integer]> where string is the mpeg audio version, list contains the bit patterns.
+For 3 and 4, use a multidimensional array.
 
-Check if map contains specified bit pattern, return the key of that map which is the MPEG Audio Version string.
+First, create a Map<Integer[], String[]>
+The key of the map will be the bit pattern,
+The string will be the bitrate/sample rate in each scenario.
+The string array will contain the bitrate/sample rate in a comma 
+separated array of strings.
 
-Would add an if statement to increment the version counter.
+Use the version and layers as switches to get the index to retrive from
+the String array in the map.
 
-2. MPEG Layer
 
-Same solution as 1 but key is MPEG Layer
 
-Would add an if statement to increment the layer counter.
 
-3. Bitrate
-
-This needs work, The proposed solution would still need individual checks for each combination as all the combinations have different bitrates except some of them.
-Proposed: 
-Have a multidimensional array, int[][] storing all the bit patterns. Iterate through a multidimensional array, if the bit pattern matches the pattern from mp3 audio file header....
-
-4. Sample rate
-
-Same as bitrate. Because the bitrate and sample rate are dependent on layer and version, i cant think of a better way to improve the algorithm
-
-5. Channel mode
-
-Same as 1 and 2 but the key would be the channel mode
