@@ -54,24 +54,13 @@ public class ExtensibleAudioReader {
 				{ "416", "320", "256", "224", "144" }, { "448", "384", "320", "256", "160" },
 				{ "bad", "bad", "bad", "bad", "bad" } };
 
+		final Integer[][] lookupTable = { { 0, 1, 2 }, { 3, 4, 4 }, };
+
 		final String[] possibleBitrates = bitrates[Integer
 				.parseInt(String.valueOf(((byteBuffer[2] >> 4) & 1)) + String.valueOf(((byteBuffer[2] >> 3) & 1))
 						+ String.valueOf(((byteBuffer[2] >> 2) & 1)) + String.valueOf(((byteBuffer[2] >> 1) & 1)), 2)];
-
-		if (version == 1) {
-			if (layer == 1) {
-				System.out.println(possibleBitrates[0]);
-			} else if (layer == 2) {
-				System.out.println(possibleBitrates[1]);
-			} else {
-				System.out.println(possibleBitrates[2]);
-			}
-		} else {
-			if (layer == 1) {
-				System.out.println(possibleBitrates[3]);
-			} else {
-				System.out.println(possibleBitrates[4]);
-			}
+		if ((version != 0) && (layer != 0) && (version != 3)) {
+			System.out.println(possibleBitrates[lookupTable[version - 1][layer - 1]]);
 		}
 	}
 
@@ -82,13 +71,10 @@ public class ExtensibleAudioReader {
 		final String[] possibleSamplerates = samplerates[Integer
 				.parseInt(String.valueOf(((byteBuffer[2] >> 6) & 1)) + String.valueOf(((byteBuffer[2] >> 5) & 1)), 2)];
 
-		if (version == 1) {
-			System.out.println(possibleSamplerates[0]);
-		} else if (version == 2) {
-			System.out.println(possibleSamplerates[1]);
-		} else {
-			System.out.println(possibleSamplerates[2]);
+		if (version != 0) {
+			System.out.println(possibleSamplerates[version - 1]);
 		}
+
 	}
 
 	public static void getChannelMode(final byte[] byteBuffer) {
