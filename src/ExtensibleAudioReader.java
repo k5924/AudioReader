@@ -5,12 +5,31 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 public class ExtensibleAudioReader {
+	final static String[] versions = { "MPEG Version 2.5", "reserved", "MPEG Version 2", "MPEG Version 1", };
+
+	final static String[] layers = { "reserved", "Layer III", "Layer II", "Layer I", };
+
+	final static String[][] bitrates = {
+			{ "free", "8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128", "144", "160", "bad" },
+			{ "free", "8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128", "144", "160", "bad" },
+			{ "free", "32", "48", "56", "64", "80", "96", "112", "128", "144", "160", "176", "192", "224", "256",
+					"bad" },
+			{ "free", "32", "40", "48", "56", "64", "80", "96", "112", "128", "160", "192", "224", "256", "320",
+					"bad" },
+			{ "free", "32", "48", "56", "64", "80", "96", "112", "128", "160", "192", "224", "256", "320", "283",
+					"bad" },
+			{ "free", "32", "64", "96", "128", "160", "192", "224", "256", "288", "320", "352", "384", "416", "448",
+					"bad" }, };
+
+	final static String[][] samplerates = { { "44100 Hz", "22050 Hz", "11025 Hz" },
+			{ "48000 Hz", "24000 Hz", "12000 Hz" }, { "32000 Hz", "16000 Hz", "8000 Hz" },
+			{ "reserv.", "reserv.", "reserv." }, };
+
+	final static String[] channels = { "Stereo", "Joint stereo (Stereo)", "Dual channel (2 mono channels)",
+			"Single channel (Mono)", };
 
 	public static int getVersion(final byte[] byteBuffer) {
-		final String[] versions = { "MPEG Version 2.5", "reserved", "MPEG Version 2", "MPEG Version 1" };
-
-		final String version = versions[Integer
-				.parseInt(String.valueOf((byteBuffer[1] >> 5) & 1) + String.valueOf(((byteBuffer[1] >> 4) & 1)), 2)];
+		final String version = versions[-((byteBuffer[1] >> 5) << 1) - ((((byteBuffer[1] >> 4))))];
 		System.out.println(version);
 
 		switch (version) {
@@ -26,10 +45,7 @@ public class ExtensibleAudioReader {
 	}
 
 	public static int getLayer(final byte[] byteBuffer) {
-		final String[] layers = { "reserved", "Layer III", "Layer II", "Layer I" };
-
-		final String layer = layers[(Integer
-				.parseInt(String.valueOf((byteBuffer[1] >> 7) & 1) + String.valueOf(((byteBuffer[1] >> 6) & 1)), 2))];
+		final String layer = layers[(-((byteBuffer[1] >> 7) << 1) + (((byteBuffer[1] >> 6))))];
 		System.out.println(layer);
 
 		switch (layer) {
@@ -45,44 +61,31 @@ public class ExtensibleAudioReader {
 	}
 
 	public static void getBitrate(final byte[] byteBuffer, final int version, final int layer) {
-		final String[][] bitrates = { { "free", "free", "free", "free", "free" }, { "32", "32", "32", "32", "8" },
-				{ "64", "48", "40", "48", "16" }, { "96", "56", "48", "56", "24" }, { "128", "64", "56", "64", "32" },
-				{ "160", "80", "64", "80", "40" }, { "192", "96", "80", "96", "48" },
-				{ "224", "112", "96", "112", "56" }, { "256", "128", "112", "128", "64" },
-				{ "288", "160", "128", "144", "80" }, { "320", "192", "160", "160", "96" },
-				{ "352", "224", "192", "176", "112" }, { "384", "256", "224", "192", "128" },
-				{ "416", "320", "256", "224", "144" }, { "448", "384", "320", "256", "160" },
-				{ "bad", "bad", "bad", "bad", "bad" } };
+		final String[] possibleBitrates = bitrates[((-((byteBuffer[1] >> 5) << 3) - (((byteBuffer[1] >> 4) << 2)))
+				- ((byteBuffer[1] >> 7) << 1) - (((byteBuffer[1] >> 6)))) - 10];
 
-		final Integer[][] lookupTable = { { 0, 1, 2 }, { 3, 4, 4 }, };
-
-		final String[] possibleBitrates = bitrates[Integer
-				.parseInt(String.valueOf(((byteBuffer[2] >> 4) & 1)) + String.valueOf(((byteBuffer[2] >> 3) & 1))
-						+ String.valueOf(((byteBuffer[2] >> 2) & 1)) + String.valueOf(((byteBuffer[2] >> 1) & 1)), 2)];
 		if ((version != 0) && (layer != 0) && (version != 3)) {
-			System.out.println(possibleBitrates[lookupTable[version - 1][layer - 1]]);
+			System.out.println(possibleBitrates[Integer.parseInt("" + (((byteBuffer[2] >> 4) & 1))
+					+ (((byteBuffer[2] >> 3) & 1)) + (((byteBuffer[2] >> 2) & 1)) + (((byteBuffer[2] >> 1) & 1)), 2)]);
+		} else {
+			System.out.println("Bitrate index not found");
 		}
 	}
 
 	public static void getSamplerate(final byte[] byteBuffer, final int version) {
-		final String[][] samplerates = { { "44100 Hz", "22050 Hz", "11025 Hz" }, { "48000 Hz", "24000 Hz", "12000 Hz" },
-				{ "32000 Hz", "16000 Hz", "8000 Hz" }, { "reserv.", "reserv.", "reserv." } };
-
-		final String[] possibleSamplerates = samplerates[Integer
-				.parseInt(String.valueOf(((byteBuffer[2] >> 6) & 1)) + String.valueOf(((byteBuffer[2] >> 5) & 1)), 2)];
+		final String[] possibleSamplerates = samplerates[-(((byteBuffer[2] >> 6) << 1)) + (((byteBuffer[2] >> 5)))];
 
 		if (version != 0) {
 			System.out.println(possibleSamplerates[version - 1]);
+		} else {
+			System.out.println("Sample rate not found");
 		}
 
 	}
 
 	public static void getChannelMode(final byte[] byteBuffer) {
-		final String[] channels = { "Stereo", "Joint stereo (Stereo)", "Dual channel (2 mono channels)",
-				"Single channel (Mono)" };
-
-		System.out.println(channels[Integer
-				.parseInt((String.valueOf((byteBuffer[3] >> 2) & 1) + String.valueOf(((byteBuffer[3] >> 1) & 1))), 2)]);
+		System.out.println(
+				channels[Integer.parseInt(("" + ((byteBuffer[3] >> 2) & 1) + (((byteBuffer[3] >> 1) & 1))), 2)]);
 	}
 
 	public static void main(final String[] args) {
