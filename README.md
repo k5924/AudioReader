@@ -93,3 +93,5 @@ java src/AudioReader
 ## [Demonstration](https://www.youtube.com/watch?v=VCsl3mkT5Mo)
 
 ### [Building the extensible version](https://youtu.be/QRB5A5Qk1RE)
+
+### [Adding improvements from conversation in final interview](https://www.youtube.com/watch?v=HMp4K5JtLZg)
