@@ -68,7 +68,7 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-If you want to use your own mp3 instead of the supplied mp3, place your mp3 file where the LBCNews.mp3 file is and in the AudioReader.java file, replace the name of the mp3 on line 25 with the name of your mp3 file.
+If you want to use your own mp3 instead of the supplied mp3, place your mp3 file where the LBCNews.mp3 file is and in the AudioReaderTest.java file, replace the name of the file with the name of your mp3 file.
 
 ### Installation
 
@@ -81,13 +81,11 @@ git clone https://github.com/your_username_/Project-Name.git
 2. Compile/Build the java file
 
 ```sh
-javac src/AudioReader.java
+javac src/main/org.k5924/AudioReader.java
 ```
 
 3. Run Java file
 
-```sh
-java src/AudioReader
-```
+> This project has no main method thus, you can execute the code via the AudioReaderTest.java
 
 ## [Demonstration](https://www.youtube.com/playlist?list=PLnvYMKNt9C8jag0asE4nt6g-77jc4SMFL)
