@@ -38,18 +38,17 @@ final class AudioReader {
 
     public static int getMpegAudioVersion(final ByteBuffer byteBuffer) {
 
-        final var pos1 = byteBuffer.get(1) >> 3 & 1;
-        final var pos2 = byteBuffer.get(1) >> 4 & 1;
-        final var index = pos2 * 2 + pos1;
+        final var bit = byteBuffer.get(1);
+        final var index = calculateIndex(bit, 3, 4);
 
         LOG.debug("MPEG Audio Version is: {}", VERSIONS[index]);
         return index;
     }
 
     public static int getLayer(final ByteBuffer byteBuffer) {
-        final var pos6 = byteBuffer.get(1) >> 1 & 1;
-        final var pos7 = byteBuffer.get(1) >> 2 & 1;
-        final var index = pos7 * 2 + pos6;
+
+        final var bit = byteBuffer.get(1);
+        final var index = calculateIndex(bit, 1, 2);
 
         LOG.debug("Layer is: {}", LAYERS[index]);
         return index;
@@ -57,11 +56,9 @@ final class AudioReader {
 
     public static String getBitrate(final ByteBuffer byteBuffer) {
 
-        final var pos1 = byteBuffer.get(2) >> 4 & 1;
-        final var pos2 = byteBuffer.get(2) >> 5 & 1;
-        final var pos3 = byteBuffer.get(2) >> 6 & 1;
-        final var pos4 = byteBuffer.get(2) >> 7 & 1;
-        final var column = pos1 + (pos2 * 2) + (pos3 * 4) + (pos4 * 8) + 1;
+        final var bit = byteBuffer.get(2);
+        final var index = calculateIndex(bit, 4, 7);
+        final var column = index + 1;
         // add 1 to account for all 0s at start
 
         final var layer = getLayer(byteBuffer);
@@ -76,9 +73,9 @@ final class AudioReader {
     }
 
     public static String getSampleRate(final ByteBuffer byteBuffer) {
-        final var pos1 = byteBuffer.get(2) >> 2 & 1;
-        final var pos2 = byteBuffer.get(2) >> 3 & 1;
-        final var row = pos1 + (pos2 * 2);
+
+        final var bit = byteBuffer.get(2);
+        final var row = calculateIndex(bit, 2, 3);
 
         final var version = getMpegAudioVersion(byteBuffer);
         final var sampleRate = SAMPLE_RATES[row][version % 3];
@@ -90,13 +87,22 @@ final class AudioReader {
     }
 
     public static String getChannelMode(final ByteBuffer byteBuffer) {
-        final var pos1 = byteBuffer.get(3) >> 6 & 1;
-        final var pos2 = byteBuffer.get(3) >> 7 & 1;
-        final var index = pos1 + (pos2 * 2);
+
+        final var bit = byteBuffer.get(3);
+        final var index = calculateIndex(bit, 6, 7);
 
         final var channelMode = CHANNEL_MODE[index];
 
         LOG.debug("Channel mode is: {}", channelMode);
         return channelMode;
+    }
+
+    private static int calculateIndex(final int bit, final int startPos, final int endPos) {
+        int total = 0;
+        for (int i = startPos; i <= endPos; i++) {
+            final var value = bit >> i & 1;
+            total += value * Math.pow(2, (double) i - startPos);
+        }
+        return total;
     }
 }
